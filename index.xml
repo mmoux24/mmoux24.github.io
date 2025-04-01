@@ -1,7 +1,56 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Blog</title><link>https://mmoux24.github.io/</link><description>Recent content on Blog</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 24 Dec 2024 19:47:06 +0800</lastBuildDate><atom:link href="https://mmoux24.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Hello World</title><link>https://mmoux24.github.io/posts/2024-12-24-hello-world/</link><pubDate>Tue, 24 Dec 2024 19:47:06 +0800</pubDate><guid>https://mmoux24.github.io/posts/2024-12-24-hello-world/</guid><description>&lt;p>demo here:&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Blog</title><link>https://mmoux24.github.io/</link><description>Recent content on Blog</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Sun, 30 Mar 2025 20:00:00 +0800</lastBuildDate><atom:link href="https://mmoux24.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>B1早报是怎样生成的</title><link>https://mmoux24.github.io/posts/2025-03-30-b1-workflow/</link><pubDate>Sun, 30 Mar 2025 20:00:00 +0800</pubDate><guid>https://mmoux24.github.io/posts/2025-03-30-b1-workflow/</guid><description>&lt;!-- ![wxmp-qrcode](/images/wxmp-qrcode.webp) -->
+&lt;div align="center">
+&lt;img src=https://mmoux24.github.io/images/wxmp-qrcode.webp width="300"/>
+&lt;/div>
+&lt;p>承蒙各位的厚爱，发布B1早报这半个月以来，很多朋友都来咨询图片是如何制作的。&lt;/p>
+&lt;p>最近稍微有些空闲时间，于是整理了下代码丢在GitHub上，欢迎star🌟：&lt;/p>
+&lt;pre tabindex="0">&lt;code>https://github.com/mmoux24/jddfz
+&lt;/code>&lt;/pre>&lt;p>代码没什么技术含量，欢迎大家魔改，希望能帮助到更多的朋友们🤘&lt;/p>
+&lt;p>接下来详细介绍一下整个B1早报的工作流，希望各位都能有所收获。&lt;/p>
+&lt;h2 id="1-思路与步骤">1. 思路与步骤&lt;/h2>
+&lt;p>总体思路比较简单，需要以下几个步骤：&lt;/p>
+&lt;ol>
+&lt;li>获得价格数据&lt;/li>
+&lt;li>计算KDJ指标&lt;/li>
+&lt;li>生成早报表格&lt;/li>
+&lt;li>渲染早报图片&lt;/li>
+&lt;li>上传分享平台&lt;/li>
+&lt;li>部署运行代码&lt;/li>
+&lt;/ol>
+&lt;p>核心代码使用Python编写，kuku就是干&lt;/p>
+&lt;h3 id="21-获得价格数据-计算kdj指标">2.1 获得价格数据 计算KDJ指标&lt;/h3>
+&lt;p>可以看下这篇&lt;a href="https://chuangshi.qq.com/read/26113630/12">KDJ扫盲文章&lt;/a>，我们只需要获取最近多日的最高价、最低价、收盘价即可计算KDJ指标。🙏感谢开源社区，已经有了相关&lt;a href="https://github.com/kaelzhang/stock-pandas">指标计算库&lt;/a>，我们只需要修改数据的指标映射关系即可计算出KDJ值。&lt;/p>
+&lt;p>我们的目标是获得KDJ的J值。根据这篇&lt;a href="https://chuangshi.qq.com/read/26113630/12">KDJ扫盲文章&lt;/a>，KDJ展示了当前收盘价格在一段时间内的波动指标，通过最近几日的最高价、最低价、收盘价即可计算KDJ。&lt;/p>
+&lt;p>&lt;a href="https://github.com/akfamily/akshare">akshare&lt;/a>提供了Python的API来通过网络获取历史行情数据，包括但不限于最高最低价、成交额成交量等。它支持东方财富、新浪、腾讯等各类数据源。&lt;/p>
+&lt;p>&lt;a href="https://github.com/kaelzhang/stock-pandas">stock-pandas&lt;/a>是一个方便好用的金融指标（MACD、BBI、KDJ等）计算库，我们只需要指定好数据格式即可计算出KDJ值。&lt;/p>
+&lt;p>相关的代码在&lt;code>jddfz/gen_fcast.py&lt;/code>，脚本使用akshare获取了20230101以来的历史数据，通过stock-pandas生成了当日、上周、上月的J值，结果输出在&lt;code>jddfz/output&lt;/code>文件夹中。&lt;/p>
+&lt;h3 id="22-生成早报表格-渲染早报图片">2.2 生成早报表格 渲染早报图片&lt;/h3>
+&lt;p>为了方便渲染，我这里采用了Markdown格式的表格作为内容，使用转图片的工具用来生成早报。&lt;/p>
+&lt;p>Markdown是一种轻量级的标记语言，你可以专注文档的内容本身，根据不同的需求进行样式渲染。（没错，这篇文章也是通过Markdown书写✍️的）&lt;/p>
+&lt;p>美是第一生产力，但可惜我不是专业的前端选手。一番搜索后找到了一款&lt;a href="https://github.com/gcui-art/markdown-to-image">markdown-to-image&lt;/a>工具，能将Markdown转换成精美的海报，同时也有&lt;a href="https://github.com/wxingheng/markdown-to-image-serve">markdown-to-image-serve&lt;/a>&lt;a href="https://github.com/YXYAXA/markdown-to-image-serve">对应的API工具&lt;/a>。&lt;/p>
+&lt;p>相关的代码在&lt;code>jddfz/fcast2md.py&lt;/code>和&lt;code>jddfz/md2img.py&lt;/code>。&lt;code>fcast2md.py&lt;/code>筛选了上一节中的负J值数据，加入红色背景样式，输出Markdown文件。&lt;code>md2img.py&lt;/code>将把该文件丢给markdown-to-image-serve来生成图片。&lt;/p>
+&lt;h3 id="23-上传分享平台">2.3 上传分享平台&lt;/h3>
+&lt;p>目前主要的分享平台是公众号和B站。网上有很多教程和开源工具，我主要参考了&lt;a href="https://blog.csdn.net/david_Xuan/article/details/136036756">wxmp&lt;/a>和&lt;a href="https://github.com/nemo2011/bilibili-api">bilibili-api&lt;/a>，按照文档写写代码，替换一下自己账户的APPID或SESSDATA即可。&lt;/p>
+&lt;p>不过比较蛋疼的一点是个人公众号不能通过API群发文章，所以现在还只是自动化生成草稿，每天再手动选择定时发送。有相关经验的朋友也请不吝赐教。&lt;/p>
+&lt;h2 id="2-最后多说几句">2. 最后多说几句&lt;/h2>
+&lt;ol>
+&lt;li>&lt;/li>
+&lt;/ol>
+&lt;p>有很多朋友都会在评论区问XXX能不能买，或者J到负值就要梭了。&lt;/p>
+&lt;p>KDJ是基于历史数据的指标，并不能完全预测未来，它只能体现前一段时间的超买超卖特性。&lt;/p>
+&lt;p>KDJ只是一个非常简单的择时操作，也要结合当时的市场环境，需要选择合适的标的，必要的时候止损，才能踏踏实实的。&lt;/p>
+&lt;ol start="2">
+&lt;li>&lt;/li>
+&lt;/ol>
+&lt;p>很多朋友也会问早报里面的XXX是谁。还是建议各位补一下直播回放，对自己的钱负责。&lt;/p>
+&lt;ol start="3">
+&lt;li>&lt;/li>
+&lt;/ol>
+&lt;p>我本人对前端展示和美化并不熟悉，但在写的过程中ChatGPT和DeepSeek帮我生成了很多好用美观的代码，我们的AI科技真的不比别人差。对我们的国家和A股有信心，只要在核心资产的车上，就总会到达目的地。&lt;/p>
+&lt;p>祝各位大富翁游戏玩得愉快。&lt;/p></description></item><item><title>Hello World</title><link>https://mmoux24.github.io/posts/2024-12-24-hello-world/</link><pubDate>Tue, 24 Dec 2024 19:47:06 +0800</pubDate><guid>https://mmoux24.github.io/posts/2024-12-24-hello-world/</guid><description>&lt;p>demo here:&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" style="color:#abb2bf;background-color:#282c34;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-cpp" data-lang="cpp">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">#include&lt;/span> &lt;span style="color:#7f848e">&amp;lt;iostream&amp;gt;&lt;/span>&lt;span style="color:#7f848e">
 &lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#7f848e">&lt;/span>
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#e5c07b">int&lt;/span> &lt;span style="color:#61afef;font-weight:bold">main&lt;/span>() {
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e06c75">std&lt;/span>&lt;span style="color:#56b6c2">::&lt;/span>&lt;span style="color:#e06c75">cout&lt;/span> &lt;span style="color:#56b6c2">&amp;lt;&amp;lt;&lt;/span> &lt;span style="color:#98c379">&amp;#34;hello world&amp;#34;&lt;/span> &lt;span style="color:#56b6c2">&amp;lt;&amp;lt;&lt;/span> &lt;span style="color:#e06c75">std&lt;/span>&lt;span style="color:#56b6c2">::&lt;/span>&lt;span style="color:#e06c75">endl&lt;/span>;
 &lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>About</title><link>https://mmoux24.github.io/pages/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mmoux24.github.io/pages/about/</guid><description>&lt;p>It&amp;rsquo;s mmoux24 here.&lt;/p></description></item></channel></rss>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>About</title><link>https://mmoux24.github.io/pages/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mmoux24.github.io/pages/about/</guid><description>&lt;p>&lt;img src="https://mmoux24.github.io/images/wxmp-qrcode.webp" alt="">&lt;/p></description></item></channel></rss>
